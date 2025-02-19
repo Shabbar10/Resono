@@ -16,5 +16,8 @@
     </VBox>
     <VBox alignment="TOP_RIGHT" spacing="10.0">
         <MediaView fx:id="mediaView" fitHeight="480" fitWidth="640" />
+        <HBox>
+            <Button fx:id="playPauseButton" text="Pause" onAction="#playPauseVideo" />
+        </HBox>
     </VBox>
 </HBox>

@@ -4,6 +4,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -20,7 +21,10 @@ import java.util.concurrent.Executors;
 
 public class ResonoController {
     @FXML private ImageView webcamView;
+
     @FXML private MediaView mediaView;
+    private MediaPlayer mediaPlayer;
+    @FXML private Button playPauseButton;
 
     private Webcam webcam;
     private ExecutorService webcamExecutor;
@@ -83,7 +87,7 @@ public class ResonoController {
                 Media video = new Media(videoFile.toURI().toString());
                 System.out.println("Media object created");
 
-                MediaPlayer mediaPlayer = new MediaPlayer(video);
+                mediaPlayer = new MediaPlayer(video);
                 System.out.println("Media player created");
 
                 mediaPlayer.setOnReady(() -> {
@@ -109,6 +113,20 @@ public class ResonoController {
                 e.printStackTrace();
             }
         });
+    }
+
+    @FXML
+    private void playPauseVideo() {
+        if (mediaPlayer != null) {
+            MediaPlayer.Status status = mediaPlayer.getStatus();
+            if (status == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+                playPauseButton.setText("Play");
+            } else {
+                mediaPlayer.play();
+                playPauseButton.setText("Pause");
+            }
+        }
     }
 
     private Image convertToFxImage(BufferedImage frame) {
