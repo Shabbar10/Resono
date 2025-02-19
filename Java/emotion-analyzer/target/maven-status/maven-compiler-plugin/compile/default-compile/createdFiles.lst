@@ -1,0 +1,5 @@
+com\emotionanalyzer\MainController.class
+com\emotionanalyzer\model\EmotionReport$SyncAnalysis.class
+com\emotionanalyzer\Main.class
+com\emotionanalyzer\model\EmotionReport$EmotionTimelineEntry.class
+com\emotionanalyzer\model\EmotionReport.class
