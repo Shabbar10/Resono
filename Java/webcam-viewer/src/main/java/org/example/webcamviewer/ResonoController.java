@@ -22,12 +22,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ResonoController {
     private Webcam webcam;
     @FXML private ImageView webcamView;
+    private boolean isRunning = true;
     @FXML Label emotion;
 
     @FXML private MediaView mediaView;
@@ -36,6 +38,7 @@ public class ResonoController {
 
     private ExecutorService webcamExecutor;
     private ExecutorService videoExecutor;
+    private ExecutorService httpExecutor;
 
     private final OkHttpClient client = new OkHttpClient();
 
@@ -43,7 +46,19 @@ public class ResonoController {
     public void initialize() {
         webcamExecutor = Executors.newSingleThreadExecutor();
         videoExecutor = Executors.newSingleThreadExecutor();
+        httpExecutor = Executors.newFixedThreadPool(2);
         webcamView.setScaleX(-1);
+
+        try {
+            URL cssUrl = getClass().getResource("/org/example/webcamviewer/styles.css");
+            if (cssUrl != null) {
+                System.out.println("CSS file found: " + cssUrl);
+            } else {
+                System.out.println("CSS file not found!");
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking CSS file: " + e.getMessage());
+        }
 
         loadVideo();
         startWebcam();
@@ -57,7 +72,7 @@ public class ResonoController {
                 webcam.open();
                 System.out.println("Webcam opened...");
 
-                while (true) {
+                while (isRunning) {
                     if (webcam.isOpen()) {
                         BufferedImage frame = webcam.getImage();
 
@@ -114,41 +129,45 @@ public class ResonoController {
     }
 
     private void sendFrameToFlask(BufferedImage image) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
-            byte[] imageBytes = baos.toByteArray();
+        httpExecutor.execute(() -> {
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "png", baos);
+                byte[] imageBytes = baos.toByteArray();
 
-            RequestBody requestBody = RequestBody.create(imageBytes, MediaType.parse("image/png"));
+                RequestBody requestBody = RequestBody.create(imageBytes, MediaType.parse("image/png"));
 
-            Request request = new Request.Builder()
-                    .url("http://127.0.0.1:5000/")
-                    .post(requestBody)
-                    .build();
+                Request request = new Request.Builder()
+                        .url("http://127.0.0.1:5000/")
+                        .post(requestBody)
+                        .build();
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    System.err.println("Failed to send frame: " + e.getMessage());
-                }
-
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    try {
-                        if (response.isSuccessful()) {
-                            System.out.println("Flask server response: " + response.code());
-                            String responseBody = response.body().string();
-                            Platform.runLater(() -> emotion.setText(responseBody));
-                        }
-                    } finally {
-                        response.close();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        System.err.println("Failed to send frame: " + e.getMessage());
                     }
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            if (response.isSuccessful()) {
+                                System.out.println("Flask server response: " + response.code());
+                                String responseBody = response.body().string();
+                                Platform.runLater(() -> emotion.setText(responseBody));
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        finally {
+                            response.close();
+                        }
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @FXML
@@ -178,11 +197,26 @@ public class ResonoController {
     }
 
     public void stopWebcam() {
-        webcamExecutor.shutdownNow(); // Stop the capture thread
-        videoExecutor.shutdownNow();
+        isRunning = false;
+
+        if (httpExecutor != null)
+            httpExecutor.shutdownNow();
+
+        if (webcamExecutor != null)
+            webcamExecutor.shutdownNow();
+
+        if (videoExecutor != null)
+            videoExecutor.shutdownNow();
+
+        if (mediaPlayer != null)
+            mediaPlayer.dispose();
+
         if (webcam != null && webcam.isOpen()) {
             webcam.close();
             System.out.println("Webcam closed...");
         }
+
+        client.dispatcher().executorService().shutdown();
+        client.connectionPool().evictAll();
     }
 }

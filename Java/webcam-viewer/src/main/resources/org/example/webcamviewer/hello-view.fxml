@@ -12,10 +12,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <HBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.webcamviewer.ResonoController"
-      stylesheets="src/main/resoruces/styles.css">
+      stylesheets="@styles.css">
     <VBox spacing="10.0">
         <ImageView fx:id="webcamView" fitWidth="640" fitHeight="480" />
-        <Label fx:id="emotion" />
+        <Label fx:id="emotion" alignment="CENTER" />
     </VBox>
     <VBox alignment="TOP_RIGHT" spacing="10.0">
         <MediaView fx:id="mediaView" fitHeight="480" fitWidth="640" />
