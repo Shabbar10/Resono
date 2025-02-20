@@ -153,7 +153,7 @@ public class ResonoController {
 
     @FXML
     private void playPauseVideo() {
-        if (mediaPlayer != null) {
+        if (mediaPlayer != null)    {
             MediaPlayer.Status status = mediaPlayer.getStatus();
             if (status == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();

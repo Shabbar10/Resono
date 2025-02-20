@@ -7,6 +7,7 @@ import time
 import logging
 from pathlib import Path
 import json
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -54,13 +55,20 @@ class ViewerEmotionAnalyzer:
         
         # Load model and cascade classifier
         try:
-            self.model = load_model('best_CNNModel.keras')
+            model_path = r"C:\Uni\miniProject\Autobot\Java\python_backend\best_CNNModel.keras"
+            if os.path.exists(model_path):
+                print("✅ Model file found!")
+            else:
+                print("❌ Model file NOT found. Check the file path.")
+
+            # self.model = load_model(r"C:\Uni\miniProject\Autobot\Java\python_backend\best_CNNModel.keras")
+            self.model = load_model(model_path)
             self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         except Exception as e:
             logger.error(f"Failed to load model or cascade classifier: {str(e)}")
             raise
 
-    def analyze_viewer_emotion(self, frame, timestamp):
+    def analyze_viewer_emotion(self, frame):
         """Analyze viewer's emotion in a single frame"""
         self.total_frames += 1
         
@@ -87,7 +95,6 @@ class ViewerEmotionAnalyzer:
                     if confidence > 0.4:
                         self.emotion_counts[emotion_label] += 1
                         self.emotion_timeline.append({
-                            'timestamp': timestamp,
                             'emotion': emotion_label,
                             'confidence': float(confidence)
                         })
