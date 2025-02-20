@@ -13,6 +13,7 @@
       fx:controller="org.example.webcamviewer.ResonoController">
     <VBox spacing="10.0">
         <ImageView fx:id="webcamView" fitWidth="640" fitHeight="480" />
+        <Label fx:id="emotion" />
     </VBox>
     <VBox alignment="TOP_RIGHT" spacing="10.0">
         <MediaView fx:id="mediaView" fitHeight="480" fitWidth="640" />

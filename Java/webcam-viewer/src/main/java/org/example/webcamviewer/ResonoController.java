@@ -5,6 +5,7 @@ import com.github.sarxos.webcam.WebcamException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -12,23 +13,31 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ResonoController {
+    private Webcam webcam;
     @FXML private ImageView webcamView;
+    @FXML Label emotion;
 
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
     @FXML private Button playPauseButton;
 
-    private Webcam webcam;
     private ExecutorService webcamExecutor;
     private ExecutorService videoExecutor;
+
+    private final OkHttpClient client = new OkHttpClient();
 
     @FXML
     public void initialize() {
@@ -55,6 +64,8 @@ public class ResonoController {
                         if (frame != null) {
                             Image fxImage = convertToFxImage(frame);
                             Platform.runLater(() -> webcamView.setImage(fxImage));
+
+                            sendFrameToFlask(frame);
                         }
                     } else {
                         break;
@@ -69,19 +80,6 @@ public class ResonoController {
     private void loadVideo() {
         videoExecutor.execute(() -> {
             try {
-                /*
-                System.out.println("Starting video loading process");
-                var resource = getClass().getResource("/videos/hello.mp4");
-                if (resource == null) {
-                    System.err.println("Video not found");
-                    return;
-                }
-
-                String videoPath = resource.toExternalForm();
-                System.out.println("Video Path: " + videoPath);
-                */
-
-                //File videoFile = new File("C:\\Dev\\webcam-viewer\\src\\main\\resources\\videos\\hello.mp4");
                 File videoFile = new File("src/main/resources/videos/hello.mp4");
 
                 Media video = new Media(videoFile.toURI().toString());
@@ -113,6 +111,44 @@ public class ResonoController {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void sendFrameToFlask(BufferedImage image) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            RequestBody requestBody = RequestBody.create(imageBytes, MediaType.parse("image/png"));
+
+            Request request = new Request.Builder()
+                    .url("http://127.0.0.1:5000/")
+                    .post(requestBody)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    System.err.println("Failed to send frame: " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    try {
+                        if (response.isSuccessful()) {
+                            System.out.println("Flask server response: " + response.code());
+                            String responseBody = response.body().string();
+                            Platform.runLater(() -> emotion.setText(responseBody));
+                        }
+                    } finally {
+                        response.close();
+                    }
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @FXML

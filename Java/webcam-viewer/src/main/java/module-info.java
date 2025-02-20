@@ -10,6 +10,8 @@ module org.example.webcamviewer {
     requires webcam.capture;
     requires java.desktop;
     requires javafx.media;
+    requires okhttp3;
+    requires annotations;
 
     opens org.example.webcamviewer to javafx.fxml;
     exports org.example.webcamviewer;
