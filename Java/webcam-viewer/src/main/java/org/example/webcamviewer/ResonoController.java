@@ -49,17 +49,6 @@ public class ResonoController {
         httpExecutor = Executors.newFixedThreadPool(2);
         webcamView.setScaleX(-1);
 
-        try {
-            URL cssUrl = getClass().getResource("/org/example/webcamviewer/styles.css");
-            if (cssUrl != null) {
-                System.out.println("CSS file found: " + cssUrl);
-            } else {
-                System.out.println("CSS file not found!");
-            }
-        } catch (Exception e) {
-            System.err.println("Error checking CSS file: " + e.getMessage());
-        }
-
         loadVideo();
         startWebcam();
     }
