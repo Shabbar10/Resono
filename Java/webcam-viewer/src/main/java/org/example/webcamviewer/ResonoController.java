@@ -13,16 +13,18 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,6 +37,10 @@ public class ResonoController {
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
     @FXML private Button playPauseButton;
+
+    @FXML Button chooseVideo = new Button("Select Video");
+    FileChooser fileChooser = new FileChooser();
+    File selectedVideo;
 
     private ExecutorService webcamExecutor;
     private ExecutorService videoExecutor;
@@ -49,7 +55,7 @@ public class ResonoController {
         httpExecutor = Executors.newFixedThreadPool(2);
         webcamView.setScaleX(-1);
 
-        loadVideo();
+        //loadVideo();
         startWebcam();
     }
 
@@ -69,7 +75,7 @@ public class ResonoController {
                             Image fxImage = convertToFxImage(frame);
                             Platform.runLater(() -> webcamView.setImage(fxImage));
 
-                            sendFrameToFlask(frame);
+//                            sendFrameToFlask(frame);
                         }
                     } else {
                         break;
@@ -81,12 +87,86 @@ public class ResonoController {
         });
     }
 
-    private void loadVideo() {
+    static File convertVideo(File inputFile) throws IOException, InterruptedException {
+        Path outputDir = Paths.get("src/main/resources/videos");
+
+        String outputFileName = getOutputFileName(inputFile);
+        Path outputPath = outputDir.resolve(outputFileName);
+
+        if (Files.exists(outputPath)) {
+            System.out.println("Already converted: " + outputPath);
+            return outputPath.toFile();
+        }
+
+        // Comprehensive logging of input parameters
+        System.out.println("Input File: " + inputFile.getAbsolutePath());
+        System.out.println("Input File Exists: " + inputFile.exists());
+        System.out.println("Input File is Readable: " + inputFile.canRead());
+        System.out.println("Output Path: " + outputPath);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "ffmpeg",
+                "-i", inputFile.getAbsolutePath(),
+                "-c:v", "libx264",
+                "-preset", "medium",
+                "-crf", "23",
+                "-c:a", "aac",
+                "-b:a", "128k",
+                "-movflags", "+faststart",
+                outputPath.toString()
+        );
+
+        // Capture both standard error and standard output
+        processBuilder.redirectErrorStream(true);
+
+        try {
+            Process process = processBuilder.start();
+
+            // Read the process output
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                    System.out.println("FFmpeg Output: " + line);
+                }
+            }
+
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                System.out.println("Video converted successfully: " + outputPath);
+                return outputPath.toFile();
+            } else {
+                System.err.println("Video conversion failed. Exit Code: " + exitCode);
+                System.err.println("FFmpeg Output:\n" + output);
+                return null;
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Exception during video conversion:");
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private static String getOutputFileName(File inputFile) {
+        String baseName = inputFile.getName();
+        int dotIndex = baseName.lastIndexOf('.');
+        baseName = baseName.substring(0, dotIndex);
+
+        return baseName + ".mp4";
+    }
+
+     void loadVideo(File file) {
         videoExecutor.execute(() -> {
             try {
-                File videoFile = new File("src/main/resources/videos/hello.mp4");
+                File convertedFile = convertVideo(file);
 
-                Media video = new Media(videoFile.toURI().toString());
+                if (convertedFile == null) {
+                    return;
+                }
+
+                Media video = new Media(convertedFile.toURI().toString());
                 System.out.println("Media object created");
 
                 mediaPlayer = new MediaPlayer(video);

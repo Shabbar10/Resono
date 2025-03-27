@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 
 public class ResonoApplication extends Application {
@@ -19,6 +20,12 @@ public class ResonoApplication extends Application {
         stage.show();
 
         controller = fxmlLoader.getController();
+
+        // Need to pass stage to chooseVideo button that calls FileChooser
+        controller.chooseVideo.setOnAction(e -> {
+            controller.selectedVideo = controller.fileChooser.showOpenDialog(stage);
+            controller.loadVideo(controller.selectedVideo);
+        });
     }
 
     @Override
