@@ -1,5 +1,5 @@
 # Overview
-Resono is designed to be a pltform for creators of video content that would like real feedback on their videos. Resono captures viewer's emotion using their webcam while watching the video and generates analytics to better inform the creators on whether the video meets certain thresholds and goals or not. Additionally, the video being watched has its speakers diarized (labeled) and their speech transcribed and summarized. The transcript is used to generate subtitles as well.
+Resono is designed to be a platform for creators of video content that would like real feedback on their videos. Resono captures viewer's emotion using their webcam while watching the video and generates analytics to better inform the creators on whether the video meets certain thresholds and goals or not. Additionally, the video being watched has its speakers diarized (labeled) and their speech transcribed and summarized. The transcript is used to generate subtitles as well.
 
 Resono is meant to be a companion to another project, [Shortify](https://github.com/SurabSebait/Shortify/tree/secondary).
 
