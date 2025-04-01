@@ -5,24 +5,20 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.media.*?>
 
+<?import javafx.scene.chart.PieChart?>
 <HBox stylesheets="@styles.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="org.example.webcamviewer.ResonoController">
    <children>
        <VBox spacing="10.0">
-          <children>
-              <ImageView fx:id="webcamView" fitHeight="143.0" fitWidth="167.0" />
-              <Label fx:id="emotion" alignment="CENTER" />
-          </children>
+           <ImageView fx:id="webcamView" fitHeight="143.0" fitWidth="167.0"/>
+           <Label fx:id="emotion" alignment="CENTER"/>
+           <PieChart fx:id="pieChart" />
        </VBox>
        <VBox alignment="TOP_RIGHT" spacing="10.0">
-          <children>
-              <MediaView fx:id="mediaView" fitHeight="480" fitWidth="640" preserveRatio="false" />
-              <Button fx:id="chooseVideo" text="Select Video" />
-              <HBox>
-                 <children>
-                     <Button fx:id="playPauseButton" onAction="#playPauseVideo" styleClass="button" text="Pause" />
-                 </children>
-              </HBox>
-          </children>
+           <MediaView fx:id="mediaView" fitHeight="480" fitWidth="640" preserveRatio="false"/>
+           <Button fx:id="chooseVideo" text="Select Video"/>
+           <HBox>
+               <Button fx:id="playPauseButton" onAction="#playPauseVideo" styleClass="button" text="Pause"/>
+           </HBox>
        </VBox>
    </children>
 </HBox>

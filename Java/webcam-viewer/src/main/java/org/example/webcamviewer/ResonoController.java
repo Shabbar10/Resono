@@ -2,8 +2,11 @@ package org.example.webcamviewer;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -14,6 +17,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,6 +29,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +41,12 @@ public class ResonoController {
     @FXML private ImageView webcamView;
     private boolean isRunning = true;
     @FXML Label emotion;
+
+    private final Map<String, Integer> emotionCounts = new HashMap<>();
+    @FXML private PieChart pieChart = new PieChart();
+    private final List<String> emotions = Arrays.asList(
+            "Happy", "Sad", "Angry", "Surprise", "Neutral", "Fear", "Disgust"
+    );
 
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
@@ -55,6 +69,12 @@ public class ResonoController {
         httpExecutor = Executors.newFixedThreadPool(2);
         webcamView.setScaleX(-1);
 
+        initializeChart();
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> updateChart()));
+        timeline.setCycleCount(Timeline.INDEFINITE); // Repeat forever
+        timeline.play();
+
         //loadVideo();
         startWebcam();
     }
@@ -75,7 +95,7 @@ public class ResonoController {
                             Image fxImage = convertToFxImage(frame);
                             Platform.runLater(() -> webcamView.setImage(fxImage));
 
-//                            sendFrameToFlask(frame);
+                            sendFrameToFlask(frame);
                         }
                     } else {
                         break;
@@ -83,6 +103,47 @@ public class ResonoController {
                 }
             } catch (WebcamException e) {
                 e.printStackTrace();
+            }
+        });
+    }
+
+    private void initializeChart() {
+        // Initialize the emotionCounts map
+        for (String emotionType : emotions) {
+            emotionCounts.put(emotionType, 1); // Start with 1 for smoother animation
+        }
+
+        // Add data to the chart
+        for (String emotionType : emotions) {
+            pieChart.getData().add(new PieChart.Data(emotionType, 1));
+        }
+    }
+
+    private void updateChart() {
+        // Get current emotion from the label
+        // This is the problematic line - emotion.toString() doesn't return what you expect
+        // Instead, we need to get the actual text from the label
+        String detectedEmotion = emotion.getText();
+
+        // Default to "Neutral" if the detected emotion is empty or not recognized
+        if (detectedEmotion == null || detectedEmotion.trim().isEmpty() || !emotionCounts.containsKey(detectedEmotion)) {
+            detectedEmotion = "Neutral";
+        }
+
+        // Update the count for the detected emotion
+        Integer currentCount = emotionCounts.get(detectedEmotion);
+        if (currentCount != null) {
+            emotionCounts.put(detectedEmotion, currentCount + 1);
+        }
+
+        // Update the chart data
+        Platform.runLater(() -> {
+            for (PieChart.Data data : pieChart.getData()) {
+                String emotionType = data.getName();
+                Integer count = emotionCounts.get(emotionType);
+                if (count != null) {
+                    data.setPieValue(count); // Update chart
+                }
             }
         });
     }
