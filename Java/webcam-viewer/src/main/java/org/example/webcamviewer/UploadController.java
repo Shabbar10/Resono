@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -16,12 +17,17 @@ import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
+import org.example.webcamviewer.ResonoController;
 
 public class UploadController {
 
@@ -32,17 +38,39 @@ public class UploadController {
     @FXML private Button selectFileButton;
     @FXML private VBox uploadContainer;
     @FXML private Button playPauseButton;
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private Label statusLabel;
 
 
     private MediaPlayer mediaPlayer;
-    private static final String VIDEO_FOLDER = "Autobot/Java/webcam-viewer/src/main/resources/videos/";
+    static final String VIDEO_FOLDER = "src/main/resources/videos";
+    static final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts/";
+    private static final String BACKEND_URL = "http://127.0.0.1:5001/process";
 
-    @FXML
-    private void initialize() {
-        // Ensure the 'videos' directory exists
-        File videoDir = new File(VIDEO_FOLDER);
-        if (!videoDir.exists()) {
-            videoDir.mkdir();
+    @FXML private void initialize() {
+        // Ensure the required directories exist
+        createDirectoryIfNotExists(VIDEO_FOLDER);
+        createDirectoryIfNotExists(TRANSCRIPT_FOLDER);
+
+        // Initialize UI components
+        if (progressIndicator != null) {
+            progressIndicator.setVisible(false);
+        }
+
+        if (statusLabel != null) {
+            statusLabel.setText("");
+        }
+    }
+
+    private void createDirectoryIfNotExists(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            boolean created = directory.mkdirs();
+            if (created) {
+                System.out.println("Created directory: " + directoryPath);
+            } else {
+                System.err.println("Failed to create directory: " + directoryPath);
+            }
         }
     }
 
@@ -105,52 +133,164 @@ public class UploadController {
         }
     }
 
-    @FXML private void handleFileSelect() {
+    @FXML private void handleFileSelect() throws IOException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv")
+        );
 
         File selectedFile = fileChooser.showOpenDialog(selectFileButton.getScene().getWindow());
         if (selectedFile != null) {
-            saveAndPlayVideo(selectedFile);
+            selectedFile = ResonoController.convertVideo(selectedFile);
+            saveAndProcessVideo(selectedFile);
             playPauseButton.setVisible(true);
         }
     }
 
-    private void saveAndPlayVideo(File sourceFile) {
+    private void saveAndProcessVideo(File file) {
         try {
-            File videoDir = new File(VIDEO_FOLDER);
-            if (!videoDir.exists()) {
-                videoDir.mkdirs();
+            // Update UI to show processing
+            if (statusLabel != null) {
+                statusLabel.setText("Processing video...");
+            }
+            if (progressIndicator != null) {
+                progressIndicator.setVisible(true);
             }
 
-            Path destinationPath = Paths.get(VIDEO_FOLDER, sourceFile.getName());
+            // Define target path for video
+            File targetFile = new File(VIDEO_FOLDER + file.getName());
 
-            System.out.println("Attempting to copy from: " + sourceFile.getAbsolutePath());
-            System.out.println("Destination path: " + destinationPath.toAbsolutePath());
+            // Copy file to 'videos/' directory
+            Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // 🔴 Stop and release media player before replacing file
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-                mediaPlayer.dispose();
-                mediaPlayer = null;  // Release the reference
-                System.gc(); // Force garbage collection to release the file lock
-            }
-
-            if (Files.exists(destinationPath)) {
-                Files.delete(destinationPath); // Now it should not be locked
-            }
-
-            Files.copy(sourceFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
-
-            System.out.println("✅ Video saved successfully at: " + destinationPath.toAbsolutePath());
-
-            Media media = new Media(destinationPath.toUri().toString());
+            // Play the video
+            Media media = new Media(targetFile.toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             mediaView.setMediaPlayer(mediaPlayer);
             mediaPlayer.setAutoPlay(true);
+
+            // Process the video asynchronously
+            CompletableFuture.runAsync(() -> {
+                try {
+                    // Send to backend and get transcript
+                    File transcriptFile = sendVideoToBackend(targetFile);
+
+                    // Update UI on JavaFX thread when complete
+                    javafx.application.Platform.runLater(() -> {
+                        if (progressIndicator != null) {
+                            progressIndicator.setVisible(false);
+                        }
+                        if (statusLabel != null) {
+                            statusLabel.setText("Transcript generated: " + transcriptFile.getName());
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // Update UI on error
+                    javafx.application.Platform.runLater(() -> {
+                        if (progressIndicator != null) {
+                            progressIndicator.setVisible(false);
+                        }
+                        if (statusLabel != null) {
+                            statusLabel.setText("Error: " + e.getMessage());
+                        }
+                    });
+                }
+            });
+
         } catch (IOException e) {
-            System.out.println("❌ Error copying file: " + e.getMessage());
             e.printStackTrace();
+            if (statusLabel != null) {
+                statusLabel.setText("Error: " + e.getMessage());
+            }
+            if (progressIndicator != null) {
+                progressIndicator.setVisible(false);
+            }
         }
+    }
+
+    /**
+     * Sends the video file to the Python backend for processing
+     * @param videoFile The video file to process
+     * @return The transcript file saved in the transcripts folder
+     */
+    private File sendVideoToBackend(File videoFile) throws IOException {
+        System.out.println("Sending file " + videoFile.toString() + " to flask.");
+        String boundary = UUID.randomUUID().toString();
+        String fileName = videoFile.getName();
+        String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+        File transcriptFile = new File(TRANSCRIPT_FOLDER + baseName + ".srt");
+
+        // Create URL connection
+        URL url = new URL(BACKEND_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+        connection.setConnectTimeout(60000); // 60 second timeout for connection
+        connection.setReadTimeout(300000);   // 5 minute timeout for read
+
+        // Write multipart form data
+        try (OutputStream outputStream = connection.getOutputStream();
+             PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream), true)) {
+
+            writer.append("--").append(boundary).append("\r\n");
+            writer.append("Content-Disposition: form-data; name=\"file\"; filename=\"")
+                    .append(videoFile.getName()).append("\"\r\n");
+            writer.append("Content-Type: application/octet-stream\r\n\r\n");
+            writer.flush();
+
+            // Write the file data
+            try (FileInputStream fileInputStream = new FileInputStream(videoFile)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                outputStream.flush();
+            }
+
+            writer.append("\r\n--").append(boundary).append("--\r\n");
+            writer.flush();
+        }
+
+        // Get the response
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            // Save the response (SRT file) to the transcripts folder
+            try (InputStream inputStream = connection.getInputStream();
+                 FileOutputStream fileOutputStream = new FileOutputStream(transcriptFile)) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            return transcriptFile;
+        } else {
+            // Handle error response
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getErrorStream()))) {
+                StringBuilder errorResponse = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    errorResponse.append(line);
+                }
+                throw new IOException("Backend error (code " + responseCode +
+                        "): " + errorResponse.toString());
+            }
+        }
+    }
+
+    @FXML private void navigateToTranscriptions(ActionEvent event) throws IOException {
+        // Navigate to the transcription view (if you have one)
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/webcamviewer/transcription-view.fxml"));
+        Parent transcriptionView = loader.load();
+
+        Scene currentScene = ((Node) event.getSource()).getScene();
+        Stage stage = (Stage) currentScene.getWindow();
+
+        stage.setScene(new Scene(transcriptionView));
+        stage.show();
     }
 }

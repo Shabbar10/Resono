@@ -108,35 +108,27 @@ public class ResonoController {
     }
 
     private void initializeChart() {
-        // Initialize the emotionCounts map
         for (String emotionType : emotions) {
             emotionCounts.put(emotionType, 1); // Start with 1 for smoother animation
         }
 
-        // Add data to the chart
         for (String emotionType : emotions) {
             pieChart.getData().add(new PieChart.Data(emotionType, 1));
         }
     }
 
     private void updateChart() {
-        // Get current emotion from the label
-        // This is the problematic line - emotion.toString() doesn't return what you expect
-        // Instead, we need to get the actual text from the label
         String detectedEmotion = emotion.getText();
 
-        // Default to "Neutral" if the detected emotion is empty or not recognized
         if (detectedEmotion == null || detectedEmotion.trim().isEmpty() || !emotionCounts.containsKey(detectedEmotion)) {
             detectedEmotion = "Neutral";
         }
 
-        // Update the count for the detected emotion
         Integer currentCount = emotionCounts.get(detectedEmotion);
         if (currentCount != null) {
             emotionCounts.put(detectedEmotion, currentCount + 1);
         }
 
-        // Update the chart data
         Platform.runLater(() -> {
             for (PieChart.Data data : pieChart.getData()) {
                 String emotionType = data.getName();
@@ -146,6 +138,21 @@ public class ResonoController {
                 }
             }
         });
+    }
+
+    @FXML
+    private void handleChooseVideo() {
+        fileChooser.setTitle("Select Video");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*mkv")
+        );
+
+        selectedVideo = fileChooser.showOpenDialog(chooseVideo.getScene().getWindow());
+
+        if (selectedVideo != null) {
+            loadVideo(selectedVideo);
+            sendVideoToFlask(selectedVideo);
+        }
     }
 
     static File convertVideo(File inputFile) throws IOException, InterruptedException {
@@ -295,6 +302,80 @@ public class ResonoController {
                     }
                 });
             } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void sendVideoToFlask(File videoFile) {
+        httpExecutor.execute(() -> {
+            try {
+                // Create a multipart request body for file upload
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart(
+                                "file",
+                                videoFile.getName(),
+                                RequestBody.create(videoFile, MediaType.parse("video/mp4"))
+                        )
+                        .build();
+
+                // Create the request
+                Request request = new Request.Builder()
+                        .url("http://127.0.0.1:5001/process")
+                        .post(requestBody)
+                        .build();
+
+                // Execute the request asynchronously
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        Platform.runLater(() -> {
+                            System.err.println("Failed to upload video: " + e.getMessage());
+                            // You might want to update the UI to show the error
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        try {
+                            if (response.isSuccessful()) {
+                                System.out.println("Video processed successfully: " + response.code());
+
+                                // Handle the SRT file that's returned
+                                ResponseBody responseBody = response.body();
+                                if (responseBody != null) {
+                                    // Save the returned SRT file
+                                    String fileName = videoFile.getName().replaceFirst("[.][^.]+$", "") + ".srt";
+                                    File outputFile = new File("subtitles/" + fileName);
+
+                                    // Ensure the directory exists
+                                    outputFile.getParentFile().mkdirs();
+
+                                    // Write the response to file
+                                    try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+                                        fos.write(responseBody.bytes());
+                                    }
+
+                                    Platform.runLater(() -> {
+                                        System.out.println("SRT file saved to: " + outputFile.getAbsolutePath());
+                                        // Update UI if needed
+                                    });
+                                }
+                            } else {
+                                Platform.runLater(() -> {
+                                    System.err.println("Server error: " + response.code() + " " + response.message());
+                                    // Update UI to show error
+                                });
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            response.close();
+                        }
+                    }
+                });
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });

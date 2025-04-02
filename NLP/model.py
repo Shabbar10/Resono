@@ -21,10 +21,10 @@ pipeline = Pipeline.from_pretrained(
 def format_timestamp(seconds):
     milliseconds = int((seconds % 1) * 1000)
     formatted_time = str(timedelta(seconds=int(seconds))) + f",{milliseconds:03d}"
-    return format_timestamp
+    return formatted_time
 
 def extract_audio(video_path, audio_path):
-    video = VideoClip(video_path)
+    video = VideoFileClip(video_path)
     video.audio.write_audiofile(audio_path, codec="pcm_s16le", fps=16000)
 
 @app.route("/process", methods=["POST"])

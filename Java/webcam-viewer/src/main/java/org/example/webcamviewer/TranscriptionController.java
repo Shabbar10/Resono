@@ -45,8 +45,8 @@ public class TranscriptionController {
     private ObservableList<String> videoList = FXCollections.observableArrayList();
     private ObservableList<String> filteredList = FXCollections.observableArrayList();
 
-    private final String VIDEO_FOLDER = "Java/webcam-viewer/src/main/resources/videos";
-    private final String TRANSCRIPT_FOLDER = "Java/webcam-viewer/src/main/resources/transcripts"; // Path to transcripts
+    private final String VIDEO_FOLDER = "src/main/resources/videos";
+    private final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts"; // Path to transcripts
 
     public void initialize() {
         loadVideoFiles();
@@ -107,7 +107,8 @@ public class TranscriptionController {
             String[] files = folder.list((dir, name) ->
                     name.toLowerCase().endsWith(".mp4") ||
                             name.toLowerCase().endsWith(".avi") ||
-                            name.toLowerCase().endsWith(".mov")
+                            name.toLowerCase().endsWith(".mov") ||
+                            name.toLowerCase().endsWith(".wav")
             );
 
             if (files == null || files.length == 0) {
@@ -143,7 +144,8 @@ public class TranscriptionController {
     private void accessTranscript() {
         String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
         if (selectedVideo != null) {
-            File transcriptFile = new File(TRANSCRIPT_FOLDER, selectedVideo + "_transcript.txt");
+            System.out.println("videos" + selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
+            File transcriptFile = new File(TRANSCRIPT_FOLDER, "videos" + selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
             if (transcriptFile.exists()) {
                 try {
                     String content = Files.readString(Path.of(transcriptFile.getAbsolutePath()));
