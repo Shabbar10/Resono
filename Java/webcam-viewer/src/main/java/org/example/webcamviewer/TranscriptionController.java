@@ -1,10 +1,16 @@
 package org.example.webcamviewer;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,15 +22,24 @@ import java.util.Objects;
 
 public class TranscriptionController {
 
-    @FXML private ComboBox<String> filterOptions;
-    @FXML private TextField searchField;
-    @FXML private ListView<String> videoListView;
-    @FXML private TextArea transcriptArea;
-    @FXML private TextArea summaryArea;
-    @FXML private Button accessTranscriptButton;
-    @FXML private Button generateSummaryButton;
-    @FXML private Button downloadTranscriptButton;
-    @FXML private Button downloadSummaryButton;
+    @FXML
+    private ComboBox<String> filterOptions;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ListView<String> videoListView;
+    @FXML
+    private TextArea transcriptArea;
+    @FXML
+    private TextArea summaryArea;
+    @FXML
+    private Button accessTranscriptButton;
+    @FXML
+    private Button generateSummaryButton;
+    @FXML
+    private Button downloadTranscriptButton;
+    @FXML
+    private Button downloadSummaryButton;
 
     private final TranscriptService transcriptService = new TranscriptService();
     private ObservableList<String> videoList = FXCollections.observableArrayList();
@@ -37,6 +52,51 @@ public class TranscriptionController {
         loadVideoFiles();
         filteredList.addAll(videoList);
         videoListView.setItems(filteredList);
+    }
+
+    @FXML
+    private void handleUploadButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+    @FXML
+    private void handleDashboardButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+    @FXML
+    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+
+    @FXML
+    private void handleSettingsButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
     }
 
     private void loadVideoFiles() {

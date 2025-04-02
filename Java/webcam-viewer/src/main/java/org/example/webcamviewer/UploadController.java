@@ -14,6 +14,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,51 @@ public class UploadController {
         if (!videoDir.exists()) {
             videoDir.mkdir();
         }
+    }
+
+    @FXML
+    private void handleUploadButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+    @FXML
+    private void handleDashboardButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+    @FXML
+    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+
+    @FXML
+    private void handleSettingsButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
     }
 
     @FXML

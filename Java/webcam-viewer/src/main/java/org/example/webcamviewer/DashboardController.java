@@ -41,16 +41,37 @@ public class DashboardController {
     }
 
     @FXML
-    private void openTranscriptionView() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("transcript.fxml"));
-            Parent transcriptionView = loader.load();
+    private void handleDashboardButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
 
-            // Set Transcription.fxml in the center of the BorderPane
-            mainLayout.setCenter(transcriptionView);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+    @FXML
+    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
+
+
+    @FXML
+    private void handleSettingsButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
     }
 
     public void initialize() {
