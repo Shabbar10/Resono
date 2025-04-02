@@ -1,8 +1,9 @@
 package org.example.webcamviewer;
 
-import com.jfoenix.controls.JFXButton;
+//import com.jfoenix.controls.JFXButton;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
 
@@ -10,7 +11,7 @@ public class DashboardController {
 
     @FXML private Label welcomeMessage;
     @FXML private Label subheading;
-    @FXML private JFXButton uploadButton;
+    @FXML private Button uploadButton;
 
     public void initialize() {
         // Fade-in animation for the welcome message
