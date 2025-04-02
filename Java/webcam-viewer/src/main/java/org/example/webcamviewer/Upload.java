@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public class Dashboard extends Application {
+public class Upload extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));

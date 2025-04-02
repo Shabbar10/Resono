@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+
+<BorderPane minHeight="720.0" minWidth="1280.0" prefHeight="554.0" prefWidth="1067.0"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.webcamviewer.UploadController">
+
+    <!-- Sidebar -->
+    <left>
+        <VBox alignment="CENTER" prefWidth="300" spacing="20" style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono"/>
+            <Button fx:id="btnDashboard"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                    text="Dashboard"/>
+            <Button fx:id="btnUpload"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                    text="Upload Video"/>
+            <Button fx:id="btnTranscription"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                    text="Transcription"/>
+            <Button fx:id="btnSettings"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                    text="Settings"/>
+        </VBox>
+    </left>
+
+    <!-- Main Content -->
+    <center>
+        <VBox alignment="CENTER" spacing="10">
+            <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;"
+                   text="Upload Your Video"/>
+            <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;"
+                   text="Get insights into your audience like never before!"/>
+            <Button fx:id="selectFileButton"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;"
+                    text="Upload"/>
+            <MediaView fx:id="mediaView" fitHeight="360.0" fitWidth="640.0"/>
+
+        </VBox>
+    </center>
+</BorderPane>

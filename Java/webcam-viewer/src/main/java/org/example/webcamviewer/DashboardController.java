@@ -1,17 +1,49 @@
 package org.example.webcamviewer;
 
-//import com.jfoenix.controls.JFXButton;
-import javafx.animation.FadeTransition;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+
 import javafx.scene.control.Label;
 import javafx.util.Duration;
+import javafx.animation.FadeTransition;
 
 public class DashboardController {
 
-    @FXML private Label welcomeMessage;
-    @FXML private Label subheading;
-    @FXML private Button uploadButton;
+    @FXML
+    private Label welcomeMessage;
+    @FXML
+    private Label subheading;
+    @FXML
+    private Button uploadChangeButton;
+    @FXML
+    private Button uploadButton;
+    @FXML
+    private MediaView mediaView;
+    private MediaPlayer mediaPlayer;
+
+    @FXML
+    private void handleUploadButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Upload Video");
+        stage.show();
+    }
 
     public void initialize() {
         // Fade-in animation for the welcome message
@@ -20,4 +52,6 @@ public class DashboardController {
         fadeIn.setToValue(1);
         fadeIn.play();
     }
+
+
 }

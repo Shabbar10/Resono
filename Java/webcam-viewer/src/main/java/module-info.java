@@ -1,6 +1,9 @@
 module org.example.webcamviewer {
-    requires javafx.fxml;
     requires javafx.web;
+    requires javafx.media;
+    requires javafx.controls;
+    requires javafx.fxml;
+    requires com.jfoenix;
 
     requires org.controlsfx.controls;
     requires org.kordamp.ikonli.javafx;
@@ -8,10 +11,8 @@ module org.example.webcamviewer {
     requires eu.hansolo.tilesfx;
     requires webcam.capture;
     requires java.desktop;
-    requires javafx.media;
     requires okhttp3;
     requires annotations;
-    requires com.jfoenix;
 
     opens org.example.webcamviewer to javafx.fxml;
     exports org.example.webcamviewer;
