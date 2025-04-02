@@ -21,7 +21,7 @@
         <VBox alignment="CENTER" spacing="10">
             <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Welcome to Resono!" />
             <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;" text="Get insights into your audience like never before!" />
-            <Button fx:id="uploadChangeButton" onAction="#handleUploadButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Upload Your First Video" />
+            <Button fx:id="uploadChangeButton" onAction="#handleUploadButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Get started by uploading a video!" />
         </VBox>
     </center>
 </BorderPane>
