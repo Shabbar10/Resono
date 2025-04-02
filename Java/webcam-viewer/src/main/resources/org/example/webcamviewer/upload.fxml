@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
@@ -19,6 +20,7 @@
             <Button fx:id="btnTranscription" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription" />
             <Button fx:id="btnSettings" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Settings" />
         </VBox>
+        <Label fx:id="statusLabel" />
     </left>
 
     <!-- Main Content -->
@@ -35,6 +37,11 @@
                 </VBox.margin>
             </Label>
             <MediaView fx:id="mediaView" fitHeight="360.0" fitWidth="640.0" />
+            <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Upload Your Video" />
+            <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;" text="Get insights into your audience like never before!" />
+            <Button fx:id="selectFileButton" onAction="#handleFileSelect" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Upload" />
+            <MediaView fx:id="mediaView" fitHeight="360.0" fitWidth="640.0" />
+           <ProgressIndicator fx:id="progressIndicator" />
 
         </VBox>
     </center>
