@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.webcamviewer.DashboardController">
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="mainLayout" minHeight="900.0" minWidth="1600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.webcamviewer.DashboardController">
 
     <!-- Sidebar -->
     <left>
-        <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #2C3E50; -fx-padding: 20px;" prefWidth="200">
-            <Label text="Resono" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
-            <Button text="Dashboard" fx:id="btnDashboard" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"/>
-            <Button text="Upload Video" fx:id="btnUpload" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"/>
-            <Button text="Transcription" fx:id="btnTranscription" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"/>
-            <Button text="Settings" fx:id="btnSettings" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"/>
+        <VBox alignment="CENTER" prefWidth="200" spacing="20" style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono" />
+            <Button fx:id="btnDashboard" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Dashboard" />
+            <Button fx:id="btnUpload" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video" />
+            <Button fx:id="btnTranscription" onAction="#openTranscriptionView" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription" />
+            <Button fx:id="btnSettings" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Settings" />
         </VBox>
     </left>
 
     <!-- Main Content -->
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <Label text="Welcome to Resono!" style="-fx-font-size: 28px; -fx-font-weight: bold;" fx:id="welcomeMessage"/>
-            <Label text="Get insights into your audience like never before!" style="-fx-font-size: 16px; -fx-text-fill: #555;" fx:id="subheading"/>
-            <Button text="Upload Your First Video" fx:id="uploadButton"
-                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+            <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Welcome to Resono!" />
+            <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;" text="Get insights into your audience like never before!" />
+            <Button fx:id="uploadButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Upload Your First Video" />
         </VBox>
     </center>
 </BorderPane>

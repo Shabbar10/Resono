@@ -11,7 +11,7 @@ public class Dashboard extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1600, 900);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Resono Dashboard");
         primaryStage.show();
