@@ -25,18 +25,14 @@ import java.nio.file.StandardCopyOption;
 
 public class UploadController {
 
-    @FXML
-    private Label welcomeMessage;
-    @FXML
-    private Label subheading;
-    @FXML
-    private Button uploadButton;
-    @FXML
-    private MediaView mediaView;
-    @FXML
-    private Button selectFileButton;
-    @FXML
-    private VBox uploadContainer;
+    @FXML private Label welcomeMessage;
+    @FXML private Label subheading;
+    @FXML private Button uploadButton;
+    @FXML private MediaView mediaView;
+    @FXML private Button selectFileButton;
+    @FXML private VBox uploadContainer;
+    @FXML private Button playPauseButton;
+
 
     private MediaPlayer mediaPlayer;
     private static final String VIDEO_FOLDER = "Autobot/Java/webcam-viewer/src/main/resources/videos/";
@@ -96,13 +92,27 @@ public class UploadController {
     }
 
     @FXML
-    private void handleFileSelect() {
+    private void playPauseVideo() {
+        if (mediaPlayer != null) {
+            MediaPlayer.Status status = mediaPlayer.getStatus();
+            if (status == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+                playPauseButton.setText("Play");
+            } else {
+                mediaPlayer.play();
+                playPauseButton.setText("Pause");
+            }
+        }
+    }
+
+    @FXML private void handleFileSelect() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv"));
 
         File selectedFile = fileChooser.showOpenDialog(selectFileButton.getScene().getWindow());
         if (selectedFile != null) {
             saveAndPlayVideo(selectedFile);
+            playPauseButton.setVisible(true);
         }
     }
 

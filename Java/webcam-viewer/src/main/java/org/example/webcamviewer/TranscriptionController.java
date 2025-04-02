@@ -67,22 +67,22 @@ public class TranscriptionController {
 
     @FXML
     private void handleDashboardButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+        Parent dashboardPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setScene(new Scene(dashboardPage, 1600, 900));
         stage.setTitle("Upload Video");
         stage.show();
     }
 
     @FXML
     private void handleTranscriptionButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+        Parent transcriptPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
-        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setScene(new Scene(transcriptPage, 1600, 900));
         stage.setTitle("Upload Video");
         stage.show();
     }

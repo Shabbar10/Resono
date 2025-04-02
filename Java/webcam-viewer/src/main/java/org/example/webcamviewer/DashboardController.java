@@ -16,6 +16,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
+
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.Parent;
@@ -31,7 +33,7 @@ public class DashboardController {
 
     @FXML
     private void handleUploadButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("upload.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
@@ -42,7 +44,7 @@ public class DashboardController {
 
     @FXML
     private void handleDashboardButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
@@ -53,7 +55,7 @@ public class DashboardController {
 
     @FXML
     private void handleTranscriptionButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("transcript.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
@@ -65,7 +67,7 @@ public class DashboardController {
 
     @FXML
     private void handleSettingsButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
