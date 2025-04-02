@@ -5,44 +5,67 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.input.KeyEvent;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 public class TranscriptionController {
 
-    public ComboBox<String> filterOptions;
-    public TextField searchField;
-    @FXML
-    private ListView<String> videoListView;
-
-    @FXML
-    private TextArea transcriptArea;
-
-    @FXML
-    private TextArea summaryArea;
-
-    @FXML
-    private Button accessTranscriptButton;
-
-    @FXML
-    private Button generateSummaryButton;
-
-    @FXML
-    private Button downloadTranscriptButton;
-
-    @FXML
-    private Button downloadSummaryButton;
+    @FXML private ComboBox<String> filterOptions;
+    @FXML private TextField searchField;
+    @FXML private ListView<String> videoListView;
+    @FXML private TextArea transcriptArea;
+    @FXML private TextArea summaryArea;
+    @FXML private Button accessTranscriptButton;
+    @FXML private Button generateSummaryButton;
+    @FXML private Button downloadTranscriptButton;
+    @FXML private Button downloadSummaryButton;
 
     private final TranscriptService transcriptService = new TranscriptService();
-
     private ObservableList<String> videoList = FXCollections.observableArrayList();
     private ObservableList<String> filteredList = FXCollections.observableArrayList();
 
+    private final String VIDEO_FOLDER = "Java/webcam-viewer/src/main/resources/videos";
+    private final String TRANSCRIPT_FOLDER = "Java/webcam-viewer/src/main/resources/transcripts"; // Path to transcripts
+
     public void initialize() {
-        // Example video list
-        videoList.addAll("Video 1", "Tutorial on AI", "JavaFX Basics", "Deep Learning Intro", "React Guide");
+        loadVideoFiles();
         filteredList.addAll(videoList);
         videoListView.setItems(filteredList);
     }
+
+    private void loadVideoFiles() {
+        File folder = new File(VIDEO_FOLDER);
+        System.out.println("Looking for videos in: " + folder.getAbsolutePath());
+
+        if (folder.exists() && folder.isDirectory()) {
+            String[] files = folder.list((dir, name) ->
+                    name.toLowerCase().endsWith(".mp4") ||
+                            name.toLowerCase().endsWith(".avi") ||
+                            name.toLowerCase().endsWith(".mov")
+            );
+
+            if (files == null || files.length == 0) {
+                System.out.println("No videos found in " + folder.getAbsolutePath());
+                showAlert("No videos found in the folder.");
+                return;
+            }
+
+            videoList.setAll(files);
+            System.out.println("Videos loaded: " + videoList);
+        } else {
+            System.out.println("Video folder does not exist: " + folder.getAbsolutePath());
+            showAlert("Video folder not found!");
+        }
+
+        videoListView.setItems(videoList);
+    }
+
 
     @FXML
     private void onSearch(KeyEvent event) {
@@ -60,8 +83,18 @@ public class TranscriptionController {
     private void accessTranscript() {
         String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
         if (selectedVideo != null) {
-            Transcript transcript = transcriptService.fetchTranscript(selectedVideo);
-            transcriptArea.setText(transcript.getTranscriptText());
+            File transcriptFile = new File(TRANSCRIPT_FOLDER, selectedVideo + "_transcript.txt");
+            if (transcriptFile.exists()) {
+                try {
+                    String content = Files.readString(Path.of(transcriptFile.getAbsolutePath()));
+                    transcriptArea.setText(content);
+                } catch (IOException e) {
+                    showAlert("Error loading transcript: " + e.getMessage());
+                }
+            } else {
+                System.out.println("Transcript for vid generated: ");
+                showAlert("No transcript found for this video.");
+            }
         } else {
             showAlert("Please select a video to access its transcript.");
         }
@@ -73,6 +106,9 @@ public class TranscriptionController {
         if (selectedVideo != null) {
             String summary = transcriptService.fetchSummary(selectedVideo);
             summaryArea.setText(summary);
+
+            // Save summary to file
+            saveToFile(selectedVideo + "_summary.txt", summary);
         } else {
             showAlert("Please select a video to generate its summary.");
         }
@@ -80,14 +116,42 @@ public class TranscriptionController {
 
     @FXML
     private void downloadTranscript() {
-        String transcriptText = transcriptArea.getText();
-        transcriptService.saveToFile("transcript.txt", transcriptText);
+        String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
+        if (selectedVideo != null) {
+            saveToFile(selectedVideo + "_transcript.srt", transcriptArea.getText());
+        } else {
+            showAlert("Select a video to download its transcript.");
+        }
     }
 
     @FXML
     private void downloadSummary() {
-        String summaryText = summaryArea.getText();
-        transcriptService.saveToFile("summary.txt", summaryText);
+        String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
+        if (selectedVideo != null) {
+            saveToFile(selectedVideo + "_summary.txt", summaryArea.getText());
+        } else {
+            showAlert("Select a video to download its summary.");
+        }
+    }
+
+    private void saveToFile(String fileName, String content) {
+        if (content == null || content.isBlank()) {
+            showAlert("No content to save.");
+            return;
+        }
+
+        File transcriptDir = new File(TRANSCRIPT_FOLDER);
+        if (!transcriptDir.exists()) {
+            transcriptDir.mkdirs();
+        }
+
+        File file = new File(transcriptDir, fileName);
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(content);
+            showAlert("File saved: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            showAlert("Error saving file: " + e.getMessage());
+        }
     }
 
     private void showAlert(String message) {

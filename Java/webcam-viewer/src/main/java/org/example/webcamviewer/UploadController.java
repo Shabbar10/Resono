@@ -32,7 +32,7 @@ public class UploadController {
     @FXML private VBox uploadContainer;
 
     private MediaPlayer mediaPlayer;
-    private static final String VIDEO_FOLDER = "src/main/resources/videos/";
+    static final String VIDEO_FOLDER = "src/main/resources/videos/";
 
     @FXML private void initialize() {
         // Ensure the 'videos' directory exists
