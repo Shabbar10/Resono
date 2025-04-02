@@ -1,5 +1,4 @@
 module org.example.webcamviewer {
-    requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
 
@@ -12,6 +11,7 @@ module org.example.webcamviewer {
     requires javafx.media;
     requires okhttp3;
     requires annotations;
+    requires com.jfoenix;
 
     opens org.example.webcamviewer to javafx.fxml;
     exports org.example.webcamviewer;

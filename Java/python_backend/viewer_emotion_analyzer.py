@@ -55,7 +55,7 @@ class ViewerEmotionAnalyzer:
         
         # Load model and cascade classifier
         try:
-            model_path = r"C:\Uni\miniProject\Autobot\Java\python_backend\best_CNNModel.keras"
+            model_path = "best_CNNModel.keras"
             if os.path.exists(model_path):
                 print("✅ Model file found!")
             else:
