@@ -28,6 +28,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.example.webcamviewer.ResonoController;
+
 public class UploadController {
 
     @FXML private Label welcomeMessage;
@@ -40,8 +42,8 @@ public class UploadController {
     @FXML private ProgressIndicator progressIndicator;
 
     private MediaPlayer mediaPlayer;
-    static final String VIDEO_FOLDER = "Java/webcam-viewer/src/main/resources/videos";
-    static final String TRANSCRIPT_FOLDER = "Java/webcam-viewer/src/main/resources/transcripts";
+    static final String VIDEO_FOLDER = "src/main/resources/videos";
+    static final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts/";
     private static final String BACKEND_URL = "http://127.0.0.1:5001/process";
 
     @FXML private void initialize() {
@@ -71,7 +73,8 @@ public class UploadController {
         }
     }
 
-    @FXML private void handleFileSelect() {
+    @FXML
+    private void handleFileSelect() throws IOException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv")
@@ -79,6 +82,7 @@ public class UploadController {
 
         File selectedFile = fileChooser.showOpenDialog(selectFileButton.getScene().getWindow());
         if (selectedFile != null) {
+            selectedFile = ResonoController.convertVideo(selectedFile);
             saveAndProcessVideo(selectedFile);
         }
     }
@@ -151,6 +155,7 @@ public class UploadController {
      * @return The transcript file saved in the transcripts folder
      */
     private File sendVideoToBackend(File videoFile) throws IOException {
+        System.out.println("Sending file " + videoFile.toString() + " to flask.");
         String boundary = UUID.randomUUID().toString();
         String fileName = videoFile.getName();
         String baseName = fileName.substring(0, fileName.lastIndexOf('.'));

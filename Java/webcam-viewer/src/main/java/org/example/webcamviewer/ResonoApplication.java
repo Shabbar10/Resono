@@ -20,12 +20,6 @@ public class ResonoApplication extends Application {
         stage.show();
 
         controller = fxmlLoader.getController();
-
-        // Need to pass stage to chooseVideo button that calls FileChooser
-        controller.chooseVideo.setOnAction(e -> {
-            controller.selectedVideo = controller.fileChooser.showOpenDialog(stage);
-            controller.loadVideo(controller.selectedVideo);
-        });
     }
 
     @Override
