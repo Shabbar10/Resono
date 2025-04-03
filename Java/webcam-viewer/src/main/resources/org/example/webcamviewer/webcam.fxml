@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+
+<BorderPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.webcamviewer.WebcamController">
+    <left>
+        <VBox alignment="CENTER" prefWidth="300" spacing="20" style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono" />
+            <Button fx:id="btnDashboard" onAction="#handleDashboardButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Dashboard" />
+            <Button fx:id="btnUpload" onAction="#handleUploadButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video" />
+            <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription" />
+            <Button fx:id="btnSettings" onAction="#handleWebcamButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Settings" />
+        </VBox>
+    </left>
+
+    <center>
+        <!--        <VBox>-->
+        <VBox spacing="15" style="-fx-padding: 20px;">
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Transcription Center" />
+
+            <!-- Search and Filter Bar -->
+            <HBox spacing="10">
+                <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="Search videos..." />
+                <ComboBox fx:id="filterOptions">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Date" />
+                            <String fx:value="Name" />
+                            <String fx:value="Length" />
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+            </HBox>
+
+            <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Uploaded videos: " />
+
+            <!-- Video List -->
+            <ListView fx:id="videoListView" minHeight="200.0" prefHeight="100.0" />
+
+                  <HBox alignment="CENTER" spacing="10.0">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+               <children>
+                      <MediaView fx:id="mediaView" fitHeight="360.0" fitWidth="640.0" preserveRatio="false" />
+                       <Button fx:id="playPauseButton" onAction="#playPauseVideo" styleClass="button" text="Pause" />
+               </children>
+            </VBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                             <ImageView fx:id="webcamView" />
+                             <Label fx:id="emotion" alignment="CENTER" />
+                             <PieChart fx:id="pieChart" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" />
+               </children>
+            </HBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

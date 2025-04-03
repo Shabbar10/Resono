@@ -26,23 +26,15 @@ import javafx.scene.Parent;
 import javafx.util.Duration;
 
 public class DashboardController {
-    @FXML
-    public Button btnDashboard;
-    @FXML
-    private Label welcomeMessage;
-    @FXML
-    private Label subheading;
-    @FXML
-    private Button uploadButton;
-    @FXML
-    private Button uploadChangeButton;
-    @FXML
-    private Button btnTranscription;
-    @FXML
-    private BorderPane mainLayout;
+    @FXML public Button btnDashboard;
+    @FXML private Label welcomeMessage;
+    @FXML private Label subheading;
+    @FXML private Button uploadButton;
+    @FXML private Button uploadChangeButton;
+    @FXML private Button btnTranscription;
+    @FXML private BorderPane mainLayout;
 
-    @FXML
-    private void handleUploadButton(ActionEvent event) {
+    @FXML private void handleUploadButton(ActionEvent event) {
         try {
             System.out.println("Loading Upload Page...");
             Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
@@ -55,9 +47,7 @@ public class DashboardController {
         }
     }
 
-
-    @FXML
-    private void handleDashboardButton(ActionEvent event) throws IOException {
+    @FXML private void handleDashboardButton(ActionEvent event) throws IOException {
         Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -67,8 +57,7 @@ public class DashboardController {
         stage.show();
     }
 
-    @FXML
-    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+    @FXML private void handleTranscriptionButton(ActionEvent event) throws IOException {
         Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("transcript.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -79,9 +68,8 @@ public class DashboardController {
     }
 
 
-    @FXML
-    private void handleSettingsButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
+    @FXML private void handleWebcamButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("webcam.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 

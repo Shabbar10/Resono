@@ -88,9 +88,8 @@ public class TranscriptionController {
     }
 
 
-    @FXML
-    private void handleSettingsButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+    @FXML private void handleWebcamButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("webcam.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 

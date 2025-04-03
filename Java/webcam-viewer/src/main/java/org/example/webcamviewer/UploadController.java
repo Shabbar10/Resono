@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,8 +75,7 @@ public class UploadController {
         }
     }
 
-    @FXML
-    private void handleUploadButton(ActionEvent event) throws IOException {
+    @FXML private void handleUploadButton(ActionEvent event) throws IOException {
         Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -85,8 +85,7 @@ public class UploadController {
         stage.show();
     }
 
-    @FXML
-    private void handleDashboardButton(ActionEvent event) throws IOException {
+    @FXML private void handleDashboardButton(ActionEvent event) throws IOException {
         Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -96,8 +95,7 @@ public class UploadController {
         stage.show();
     }
 
-    @FXML
-    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+    @FXML private void handleTranscriptionButton(ActionEvent event) throws IOException {
         Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -108,9 +106,8 @@ public class UploadController {
     }
 
 
-    @FXML
-    private void handleSettingsButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+    @FXML private void handleWebcamButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("webcam.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 

@@ -24,7 +24,7 @@
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video"/>
             <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription"/>
-            <Button fx:id="btnSettings" onAction="#handleSettingsButton"
+            <Button fx:id="btnSettings" onAction="#handleWebcamButton"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Settings"/>
         </VBox>
     </left>
