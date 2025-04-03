@@ -62,7 +62,7 @@
     <center>
         <VBox spacing="15" style="-fx-padding: 20px;">
             <children>
-                <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Transcription Center"/>
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Viewer Analysis"/>
 
                 <!-- Search and Filter Bar -->
                 <HBox spacing="10">
