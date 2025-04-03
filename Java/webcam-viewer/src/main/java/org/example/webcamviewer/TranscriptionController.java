@@ -143,8 +143,8 @@ public class TranscriptionController {
     private void accessTranscript() {
         String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
         if (selectedVideo != null) {
-            System.out.println("videos" + selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
-            File transcriptFile = new File(TRANSCRIPT_FOLDER, "videos" + selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
+            System.out.println(selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
+            File transcriptFile = new File(TRANSCRIPT_FOLDER, selectedVideo.substring(0, selectedVideo.length() - 3) + "srt");
             if (transcriptFile.exists()) {
                 try {
                     String content = Files.readString(Path.of(transcriptFile.getAbsolutePath()));

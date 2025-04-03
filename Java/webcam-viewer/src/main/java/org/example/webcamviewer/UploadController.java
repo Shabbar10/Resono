@@ -44,7 +44,7 @@ public class UploadController {
 
 
     private MediaPlayer mediaPlayer;
-    static final String VIDEO_FOLDER = "src/main/resources/videos";
+    static final String VIDEO_FOLDER = "src/main/resources/videos/";
     static final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts/";
     private static final String BACKEND_URL = "http://127.0.0.1:5001/process";
 
@@ -133,7 +133,7 @@ public class UploadController {
     @FXML private void handleFileSelect() throws IOException, InterruptedException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.avi", "*.mkv")
+                new FileChooser.ExtensionFilter("Video Files", "*.mp4", "*.wav", "*.avi", "*.mkv")
         );
 
         File selectedFile = fileChooser.showOpenDialog(selectFileButton.getScene().getWindow());

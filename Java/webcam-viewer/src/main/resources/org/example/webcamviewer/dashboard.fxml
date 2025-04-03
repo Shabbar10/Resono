@@ -1,17 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="mainLayout" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.webcamviewer.DashboardController">
+<BorderPane fx:id="mainLayout" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.webcamviewer.DashboardController">
 
     <!-- Sidebar -->
     <left>
         <VBox alignment="CENTER" prefWidth="300" spacing="20" style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
-            <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono" />
-            <Button fx:id="btnDashboard" onAction="#handleDashboardButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Dashboard" />
-            <Button fx:id="btnUpload" onAction="#handleUploadButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video" />
-            <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription" />
+           <children>
+               <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono" />
+               <Button fx:id="btnDashboard" onAction="#handleDashboardButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Dashboard">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+               <Button fx:id="btnUpload" onAction="#handleUploadButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+               <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+           </children>
             <Button fx:id="btnSettings" onAction="#handleWebcamButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Settings" />
         </VBox>
     </left>
@@ -19,9 +35,15 @@
     <!-- Main Content -->
     <center>
         <VBox alignment="CENTER" spacing="10">
-            <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Welcome to Resono!" />
-            <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;" text="Get insights into your audience like never before!" />
-            <Button fx:id="uploadChangeButton" onAction="#handleUploadButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Get started by uploading a video!" />
+           <children>
+               <Label fx:id="welcomeMessage" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Welcome to Resono!" />
+               <Label fx:id="subheading" style="-fx-font-size: 16px; -fx-text-fill: #555;" text="Get insights into your audience like never before!" />
+               <Button fx:id="uploadChangeButton" onAction="#handleUploadButton" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px; -fx-border-radius: 5px;" text="Get started by uploading a video!">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+           </children>
         </VBox>
     </center>
 </BorderPane>
