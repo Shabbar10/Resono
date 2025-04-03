@@ -47,6 +47,7 @@ public class TranscriptionController {
 
     private final String VIDEO_FOLDER = "src/main/resources/videos";
     private final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts"; // Path to transcripts
+    private final String SUMMARY_FOLDER = "src/main/resources/summary";
 
     public void initialize() {
         loadVideoFiles();
@@ -165,13 +166,23 @@ public class TranscriptionController {
     private void generateSummary() {
         String selectedVideo = videoListView.getSelectionModel().getSelectedItem();
         if (selectedVideo != null) {
-            String summary = transcriptService.fetchSummary(selectedVideo);
-            summaryArea.setText(summary);
+            // Generate the summary file name (replace video extension with .txt)
+            String summaryFileName = selectedVideo.substring(0, selectedVideo.length() - 4) + "_summary.txt";
+            File summaryFile = new File(SUMMARY_FOLDER, summaryFileName);
 
-            // Save summary to file
-            saveToFile(selectedVideo + "_summary.txt", summary);
+            if (summaryFile.exists()) {
+                try {
+                    // Read the summary content
+                    String content = Files.readString(Path.of(summaryFile.getAbsolutePath()));
+                    summaryArea.setText(content);
+                } catch (IOException e) {
+                    showAlert("Error loading summary: " + e.getMessage());
+                }
+            } else {
+                showAlert("No summary found for this video.");
+            }
         } else {
-            showAlert("Please select a video to generate its summary.");
+            showAlert("Please select a video to access its summary.");
         }
     }
 

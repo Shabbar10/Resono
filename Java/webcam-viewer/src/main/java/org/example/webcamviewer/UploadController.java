@@ -27,6 +27,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.example.webcamviewer.ResonoController;
 
@@ -46,12 +48,15 @@ public class UploadController {
     private MediaPlayer mediaPlayer;
     static final String VIDEO_FOLDER = "src/main/resources/videos/";
     static final String TRANSCRIPT_FOLDER = "src/main/resources/transcripts/";
+    static final String SUMMARY_FOLDER = "src/main/resources/summary/";
+    private final String ZIP_FOLDER = "src/main/resources/zips";
     private static final String BACKEND_URL = "http://127.0.0.1:5001/process";
 
     @FXML private void initialize() {
         // Ensure the required directories exist
         createDirectoryIfNotExists(VIDEO_FOLDER);
         createDirectoryIfNotExists(TRANSCRIPT_FOLDER);
+        createDirectoryIfNotExists(SUMMARY_FOLDER);
 
         // Initialize UI components
         if (progressIndicator != null) {
@@ -173,7 +178,9 @@ public class UploadController {
             CompletableFuture.runAsync(() -> {
                 try {
                     // Send to backend and get transcript
-                    File transcriptFile = sendVideoToBackend(targetFile);
+                    File[] files = sendVideoToBackend(targetFile);
+                    File transcriptFile = files[0]; // .srt file
+                    File summaryFile = files[1];    // .txt summary file
 
                     // Update UI on JavaFX thread when complete
                     javafx.application.Platform.runLater(() -> {
@@ -181,7 +188,9 @@ public class UploadController {
                             progressIndicator.setVisible(false);
                         }
                         if (statusLabel != null) {
-                            statusLabel.setText("Transcript generated: " + transcriptFile.getName());
+                            statusLabel.setText("Processing complete:\n" +
+                                    "Transcript: " + transcriptFile.getName() + "\n" +
+                                    "Summary: " + summaryFile.getName());
                         }
                     });
                 } catch (Exception e) {
@@ -214,12 +223,13 @@ public class UploadController {
      * @param videoFile The video file to process
      * @return The transcript file saved in the transcripts folder
      */
-    private File sendVideoToBackend(File videoFile) throws IOException {
+    private File[] sendVideoToBackend(File videoFile) throws IOException {
         System.out.println("Sending file " + videoFile.toString() + " to flask.");
         String boundary = UUID.randomUUID().toString();
         String fileName = videoFile.getName();
         String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
         File transcriptFile = new File(TRANSCRIPT_FOLDER + baseName + ".srt");
+        File summaryFile = new File(SUMMARY_FOLDER + baseName + "_summary.txt");
 
         // Create URL connection
         URL url = new URL(BACKEND_URL);
@@ -257,16 +267,44 @@ public class UploadController {
         // Get the response
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            // Save the response (SRT file) to the transcripts folder
+            // Save the ZIP file first
+            File zipFile = new File(ZIP_FOLDER + baseName + "_output.zip");
             try (InputStream inputStream = connection.getInputStream();
-                 FileOutputStream fileOutputStream = new FileOutputStream(transcriptFile)) {
+                 FileOutputStream fileOutputStream = new FileOutputStream(zipFile)) {
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     fileOutputStream.write(buffer, 0, bytesRead);
                 }
             }
-            return transcriptFile;
+
+            // Unzip the file
+            try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFile))) {
+                ZipEntry entry;
+                while ((entry = zipInputStream.getNextEntry()) != null) {
+                    File outputFile;
+                    if (entry.getName().endsWith(".srt")) {
+                        outputFile = transcriptFile;
+                    } else if (entry.getName().endsWith(".txt")) {
+                        outputFile = summaryFile;
+                    } else {
+                        continue;
+                    }
+
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+                        byte[] buffer = new byte[4096];
+                        int bytesRead;
+                        while ((bytesRead = zipInputStream.read(buffer)) != -1) {
+                            fileOutputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
+                    zipInputStream.closeEntry();
+                }
+            }
+            // Delete the zip file after extraction
+            zipFile.delete();
+
+            return new File[]{transcriptFile, summaryFile}; // Return both files
         } else {
             // Handle error response
             try (BufferedReader reader = new BufferedReader(
