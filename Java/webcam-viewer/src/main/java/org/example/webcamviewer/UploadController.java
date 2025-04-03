@@ -75,33 +75,36 @@ public class UploadController {
         }
     }
 
-    @FXML private void handleUploadButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
-
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
-        stage.show();
+    @FXML private void handleUploadButton(ActionEvent event) {
+        try {
+            System.out.println("Loading Upload Page...");
+            Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(uploadPage, 1600, 900));
+            stage.setTitle("Resono");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML private void handleDashboardButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("dashboard.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
 
     @FXML private void handleTranscriptionButton(ActionEvent event) throws IOException {
-        Parent uploadPage = FXMLLoader.load(getClass().getResource("transcript.fxml"));
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("transcript.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
 
@@ -112,7 +115,7 @@ public class UploadController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
 

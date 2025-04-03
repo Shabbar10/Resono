@@ -17,84 +17,120 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.webcamviewer.TranscriptionController">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.webcamviewer.TranscriptionController">
 
     <!-- Sidebar (Reused from Dashboard) -->
     <left>
-        <VBox alignment="CENTER" prefWidth="300" spacing="20" style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
-           <children>
-               <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono" />
-               <Button fx:id="btnDashboard" onAction="#handleDashboardButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Dashboard">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-               <Button fx:id="btnUpload" onAction="#handleUploadButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Upload Video">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-               <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;" text="Transcription">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-           </children>
+        <VBox alignment="CENTER" prefWidth="300.0" spacing="20"
+              style="-fx-background-color: #2C3E50; -fx-padding: 20px;">
+            <children>
+                <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="Resono"/>
+                <Button fx:id="btnDashboard" onAction="#handleDashboardButton"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                        text="Dashboard">
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                </Button>
+                <Button fx:id="btnUpload" onAction="#handleUploadButton"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                        text="Upload Video">
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                </Button>
+                <Button fx:id="btnTranscription" onAction="#handleTranscriptionButton"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
+                        text="Transcription">
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                </Button>
+            </children>
             <Button fx:id="btnSettings" onAction="#handleWebcamButton"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14px;"
-                    text="Settings"/>
+                    text="Viewer Analysis">
+                <cursor>
+                    <Cursor fx:constant="HAND"/>
+                </cursor>
+            </Button>
         </VBox>
     </left>
 
     <!-- Main Content -->
     <center>
         <VBox spacing="15" style="-fx-padding: 20px;">
-           <children>
-               <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Transcription Center" />
+            <children>
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Transcription Center"/>
 
-               <!-- Search and Filter Bar -->
-               <HBox spacing="10">
-      <children>
-                      <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="Search videos..." />
-                      <ComboBox fx:id="filterOptions">
-                          <items>
-                              <FXCollections fx:factory="observableArrayList">
-                                  <String fx:value="Date" />
-                                  <String fx:value="Name" />
-                                  <String fx:value="Length" />
-                              </FXCollections>
-                          </items>
-                      </ComboBox>
-      </children>
-               </HBox>
+                <!-- Search and Filter Bar -->
+                <HBox spacing="10">
+                    <children>
+                        <TextField fx:id="searchField" onKeyReleased="#onSearch" promptText="Search videos..."/>
+                        <ComboBox fx:id="filterOptions">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Date"/>
+                                    <String fx:value="Name"/>
+                                    <String fx:value="Length"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </children>
+                </HBox>
 
-               <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Uploaded videos: " />
+                <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Uploaded videos: "/>
 
-               <!-- Video List -->
-               <ListView fx:id="videoListView" prefHeight="200" />
+                <!-- Video List -->
+                <ListView fx:id="videoListView" prefHeight="200">
+                    <cursor>
+                        <Cursor fx:constant="HAND"/>
+                    </cursor>
+                </ListView>
 
-               <!-- Transcript and Summary Controls -->
-               <HBox spacing="10">
-      <children>
-                      <Button fx:id="accessTranscriptButton" onAction="#accessTranscript" text="Access Transcript" />
-                      <Button fx:id="generateSummaryButton" onAction="#generateSummary" text="Generate Summary" />
-      </children>
-               </HBox>
+                <!-- Transcript and Summary Controls -->
+                <HBox spacing="10">
+                    <children>
+                        <Button fx:id="accessTranscriptButton" onAction="#accessTranscript" text="Access Transcript">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                        </Button>
 
-               <!-- Transcript Display Area -->
-               <TextArea fx:id="transcriptArea" editable="false" prefHeight="150" promptText="Transcript will appear here..." wrapText="true" />
+                        <Button fx:id="generateSummaryButton" onAction="#generateSummary" text="Generate Summary">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                        </Button>
+                    </children>
+                </HBox>
 
-               <!-- Summary Display Area -->
-               <TextArea fx:id="summaryArea" editable="false" prefHeight="100" promptText="Summary will appear here..." wrapText="true" />
+                <!-- Transcript Display Area -->
+                <TextArea fx:id="transcriptArea" editable="false" prefHeight="150"
+                          promptText="Transcript will appear here..." wrapText="true"/>
 
-               <!-- Download Buttons -->
-               <HBox spacing="10">
-      <children>
-                      <Button fx:id="downloadTranscriptButton" onAction="#downloadTranscript" text="Download Transcript" />
-                      <Button fx:id="downloadSummaryButton" onAction="#downloadSummary" text="Download Summary" />
-      </children>
-               </HBox>
-           </children>
+                <!-- Summary Display Area -->
+                <TextArea fx:id="summaryArea" editable="false" prefHeight="100" promptText="Summary will appear here..."
+                          wrapText="true"/>
+
+                <!-- Download Buttons -->
+                <HBox spacing="10">
+                    <children>
+                        <Button fx:id="downloadTranscriptButton" onAction="#downloadTranscript"
+                                text="Download Transcript">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                        </Button>
+                        <Button fx:id="downloadSummaryButton" onAction="#downloadSummary" text="Download Summary">
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
         </VBox>
     </center>
 </BorderPane>

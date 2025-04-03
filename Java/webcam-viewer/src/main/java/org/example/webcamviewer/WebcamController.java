@@ -129,6 +129,12 @@ public class WebcamController {
 
         mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.seek(Duration.ZERO));
         mediaPlayer.play();
+
+//        if (videoFile != null) {
+//            videoFile = ResonoController.convertVideo(videoFile);
+//            saveAndProcessVideo(selectedFile);
+        playPauseButton.setVisible(true);
+//        }
     }
 
     private void loadVideoFiles() {
@@ -171,6 +177,8 @@ public class WebcamController {
         videoListView.setItems(filteredList);
     }
 
+    private WebcamController controller;
+
     @FXML
     private void handleUploadButton(ActionEvent event) {
         try {
@@ -178,7 +186,7 @@ public class WebcamController {
             Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(uploadPage, 1600, 900));
-            stage.setTitle("Upload Video");
+            stage.setTitle("Resono");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -192,20 +200,22 @@ public class WebcamController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
 
     @FXML
     private void handleTranscriptionButton(ActionEvent event) throws IOException {
+
         Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("transcript.fxml")));
 
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
+
 
     @FXML
     private void handleWebcamButton(ActionEvent event) throws IOException {
@@ -214,11 +224,11 @@ public class WebcamController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 
         stage.setScene(new Scene(uploadPage, 1600, 900));
-        stage.setTitle("Upload Video");
+        stage.setTitle("Resono");
         stage.show();
     }
 
-    private void startWebcam() {
+    public void startWebcam() {
         webcamExecutor.execute(() -> {
             try {
                 webcam = Webcam.getDefault();
@@ -268,16 +278,18 @@ public class WebcamController {
             emotionCounts.put(detectedEmotion, currentCount + 1);
         }
 
+        // Update only the affected slice
+        String finalDetectedEmotion = detectedEmotion;
         Platform.runLater(() -> {
             for (PieChart.Data data : pieChart.getData()) {
-                String emotionType = data.getName();
-                Integer count = emotionCounts.get(emotionType);
-                if (count != null) {
-                    data.setPieValue(count); // Update chart
+                if (data.getName().equals(finalDetectedEmotion)) {
+                    data.setPieValue(emotionCounts.get(finalDetectedEmotion));
+                    break; // Stop loop early since we only update one slice
                 }
             }
         });
     }
+
 
     @FXML
     private void handleChooseVideo() {

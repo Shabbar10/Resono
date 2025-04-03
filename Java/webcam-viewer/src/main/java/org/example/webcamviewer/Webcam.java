@@ -18,7 +18,7 @@ public class Webcam extends Application {
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 1600, 900);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Resono Dashboard");
+        primaryStage.setTitle("Resono test");
         primaryStage.show();
 
         controller = fxmlLoader.getController();
