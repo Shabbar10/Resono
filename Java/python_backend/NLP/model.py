@@ -85,7 +85,7 @@ def process():
         f.write("\n".join(srt_output))
 
     # Generate summary
-    summary = summarizer(transcript_text, max_length=350, min_length=80, do_sample=False)[0]["summary_text"]
+    summary = summarizer(transcript_text, max_length=300, min_length=60, do_sample=False)[0]["summary_text"]
 
     # Save summary
     summary_path = os.path.join(OUTPUT_FOLDER, filename.rsplit(".", 1)[0] + "_summary.txt")

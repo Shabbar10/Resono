@@ -13,6 +13,10 @@ module org.example.webcamviewer {
     requires java.desktop;
     requires okhttp3;
     requires annotations;
+    requires org.mongodb.driver.sync.client;
+    requires org.mongodb.bson;
+    requires org.mongodb.driver.core;
+    requires jbcrypt;
 
     opens org.example.webcamviewer to javafx.fxml;
     exports org.example.webcamviewer;
