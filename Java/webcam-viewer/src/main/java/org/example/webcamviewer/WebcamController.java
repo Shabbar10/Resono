@@ -5,18 +5,29 @@ import com.github.sarxos.webcam.WebcamException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
@@ -25,34 +36,43 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ResonoController {
+public class WebcamController {
     private Webcam webcam;
-    @FXML private ImageView webcamView;
+    @FXML
+    private ImageView webcamView;
     private boolean isRunning = true;
-    @FXML Label emotion;
+    @FXML
+    Label emotion;
+    @FXML
+    private ComboBox<String> filterOptions;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ListView<String> videoListView;
 
     private final Map<String, Integer> emotionCounts = new HashMap<>();
-    @FXML private PieChart pieChart = new PieChart();
+    @FXML
+    private PieChart pieChart = new PieChart();
     private final List<String> emotions = Arrays.asList(
             "Happy", "Sad", "Angry", "Surprise", "Neutral", "Fear", "Disgust"
     );
 
-    @FXML private MediaView mediaView;
+    @FXML
+    private MediaView mediaView;
     private MediaPlayer mediaPlayer;
-    @FXML private Button playPauseButton;
+    @FXML
+    private Button playPauseButton;
 
-    @FXML Button chooseVideo = new Button("Select Video");
+    @FXML
+    Button chooseVideo = new Button("Select Video");
     FileChooser fileChooser = new FileChooser();
     File selectedVideo;
 
@@ -61,9 +81,22 @@ public class ResonoController {
     private ExecutorService httpExecutor;
 
     private final OkHttpClient client = new OkHttpClient();
+    private ObservableList<String> videoList = FXCollections.observableArrayList();
+    private ObservableList<String> filteredList = FXCollections.observableArrayList();
+
+    private final String VIDEO_FOLDER = "src/main/resources/videos";
 
     @FXML
     public void initialize() {
+        loadVideoFiles();
+        filteredList.addAll(videoList);
+        videoListView.setItems(filteredList);
+        videoListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                playVideo(newVal);
+            }
+        });
+
         webcamExecutor = Executors.newSingleThreadExecutor();
         videoExecutor = Executors.newSingleThreadExecutor();
         httpExecutor = Executors.newFixedThreadPool(2);
@@ -75,11 +108,127 @@ public class ResonoController {
         timeline.setCycleCount(Timeline.INDEFINITE); // Repeat forever
         timeline.play();
 
-        //loadVideo();
+//        loadVideo();
         startWebcam();
     }
 
-    private void startWebcam() {
+    private void playVideo(String videoPath) {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+
+        File videoFile = new File(VIDEO_FOLDER + File.separator + videoPath);
+        if (!videoFile.exists()) {
+            showAlert("Video file not found: " + videoPath);
+            return;
+        }
+
+        Media media = new Media(videoFile.toURI().toString());
+        mediaPlayer = new MediaPlayer(media);
+        mediaView.setMediaPlayer(mediaPlayer);
+
+        mediaPlayer.setOnEndOfMedia(() -> mediaPlayer.seek(Duration.ZERO));
+        mediaPlayer.play();
+
+//        if (videoFile != null) {
+//            videoFile = ResonoController.convertVideo(videoFile);
+//            saveAndProcessVideo(selectedFile);
+        playPauseButton.setVisible(true);
+//        }
+    }
+
+    private void loadVideoFiles() {
+        File folder = new File(VIDEO_FOLDER);
+        System.out.println("Looking for videos in: " + folder.getAbsolutePath());
+
+        if (folder.exists() && folder.isDirectory()) {
+            String[] files = folder.list((dir, name) ->
+                    name.toLowerCase().endsWith(".mp4") ||
+                            name.toLowerCase().endsWith(".avi") ||
+                            name.toLowerCase().endsWith(".mov") ||
+                            name.toLowerCase().endsWith(".wav")
+            );
+
+            if (files == null || files.length == 0) {
+                System.out.println("No videos found in " + folder.getAbsolutePath());
+                showAlert("No videos found in the folder.");
+                return;
+            }
+
+            videoList.setAll(files);
+            System.out.println("Videos loaded: " + videoList);
+        } else {
+            System.out.println("Video folder does not exist: " + folder.getAbsolutePath());
+            showAlert("Video folder not found!");
+        }
+
+        videoListView.setItems(videoList);
+    }
+
+    @FXML
+    private void onSearch(KeyEvent event) {
+        String searchText = searchField.getText().toLowerCase();
+        filteredList.clear();
+        for (String video : videoList) {
+            if (video.toLowerCase().contains(searchText)) {
+                filteredList.add(video);
+            }
+        }
+        videoListView.setItems(filteredList);
+    }
+
+    private WebcamController controller;
+
+    @FXML
+    private void handleUploadButton(ActionEvent event) {
+        try {
+            System.out.println("Loading Upload Page...");
+            Parent uploadPage = FXMLLoader.load(getClass().getResource("upload.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(uploadPage, 1600, 900));
+            stage.setTitle("Resono");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleDashboardButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("dashboard.fxml")));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Resono");
+        stage.show();
+    }
+
+    @FXML
+    private void handleTranscriptionButton(ActionEvent event) throws IOException {
+
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("transcript.fxml")));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Resono");
+        stage.show();
+    }
+
+
+    @FXML
+    private void handleWebcamButton(ActionEvent event) throws IOException {
+        Parent uploadPage = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("webcam.fxml")));
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+        stage.setScene(new Scene(uploadPage, 1600, 900));
+        stage.setTitle("Resono");
+        stage.show();
+    }
+
+    public void startWebcam() {
         webcamExecutor.execute(() -> {
             try {
                 webcam = Webcam.getDefault();
@@ -129,16 +278,18 @@ public class ResonoController {
             emotionCounts.put(detectedEmotion, currentCount + 1);
         }
 
+        // Update only the affected slice
+        String finalDetectedEmotion = detectedEmotion;
         Platform.runLater(() -> {
             for (PieChart.Data data : pieChart.getData()) {
-                String emotionType = data.getName();
-                Integer count = emotionCounts.get(emotionType);
-                if (count != null) {
-                    data.setPieValue(count); // Update chart
+                if (data.getName().equals(finalDetectedEmotion)) {
+                    data.setPieValue(emotionCounts.get(finalDetectedEmotion));
+                    break; // Stop loop early since we only update one slice
                 }
             }
         });
     }
+
 
     @FXML
     private void handleChooseVideo() {
@@ -225,7 +376,7 @@ public class ResonoController {
         return baseName + ".mp4";
     }
 
-     void loadVideo(File file) {
+    void loadVideo(File file) {
         videoExecutor.execute(() -> {
             try {
                 File convertedFile = convertVideo(file);
@@ -295,8 +446,7 @@ public class ResonoController {
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
-                        }
-                        finally {
+                        } finally {
                             response.close();
                         }
                     }
@@ -383,7 +533,7 @@ public class ResonoController {
 
     @FXML
     private void playPauseVideo() {
-        if (mediaPlayer != null)    {
+        if (mediaPlayer != null) {
             MediaPlayer.Status status = mediaPlayer.getStatus();
             if (status == MediaPlayer.Status.PLAYING) {
                 mediaPlayer.pause();
@@ -429,5 +579,11 @@ public class ResonoController {
 
         client.dispatcher().executorService().shutdown();
         client.connectionPool().evictAll();
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setContentText(message);
+        alert.show();
     }
 }
